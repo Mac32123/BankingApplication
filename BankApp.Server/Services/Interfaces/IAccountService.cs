@@ -6,9 +6,10 @@ namespace BankApp.Server.Services.Interfaces
 	{
 		Account? Authenticate(string AccountNumber, string Pin);
 		IEnumerable<Account> GetAccounts();
-		Account Create(Account account, string Pin, string ConfirmPin);
-		void Update(Account account, string? Pin = null);
-		void Delete(int id);
+		CreatedAccountModel Create(Account account);
+		Account Update(Account account, string Pin, string? PinToBeUpdated);
+		string GenerateToken(string AccountNumber, string role);
+		Account Delete(int id);
 		Account? GetById(int id);
 		Account? GetByAccountNumber(string AccountNumber);
 	}

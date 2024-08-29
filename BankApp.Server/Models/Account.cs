@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BankApp.Server.Models
 {
@@ -16,18 +17,12 @@ namespace BankApp.Server.Models
         public decimal CurrentAccountBalance { get; set; }
         public AccountType AccountType { get; set; }
         public string AccountNumberGenerated { get; set; }
+        [JsonIgnore]
         public byte[] PinHash { get; set; }
+        [JsonIgnore]
         public byte[] PinSalt { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
-
-        Random rand = new Random();
-
-        public Account()
-        {
-            AccountNumberGenerated = Convert.ToString((long) rand.NextDouble() * 9000000000L + 1000000000L);
-            AccountName = $"{FirstName} {LastName}";
-        }
     }
 
     public enum AccountType
@@ -35,7 +30,9 @@ namespace BankApp.Server.Models
         Savings,        //konto oszczędnościowe
         Current,        //konto walutowe
         Corporate,      //konto firmowe
-        Government      //konto rządowe
+        Government,     //konto rządowe
+        BankSettlement, //konto banku do wypłaty i wpłaty pieniędzy
+        BankManagement       //konto bankowe do zarządzania innymi kontami (np. do tworzenia kont)
         //można dodawać kolejne
     }
 
