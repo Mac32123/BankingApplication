@@ -10,6 +10,9 @@ namespace BankApp.Server.Models
 		[Key]
 		public int Id { get; set; }
 		public string TransactionUniqueReference { get; set; }
+		public string TransactionTitle {  get; set; }
+		public string TransactionAccount {  get; set; }
+		public decimal AccountBalance { get; set; }
 		public decimal TransactionAmmount { get; set; }
 		public TranStatus TransactionStatus { get; set; }
 		public bool IsSuccessful => TransactionStatus.Equals(TranStatus.Success);
@@ -23,6 +26,21 @@ namespace BankApp.Server.Models
         {
 			TransactionUniqueReference = $"{Guid.NewGuid().ToString().Replace("-", "").Substring(1, 27)}";
         }
+		public Transaction(Transaction transaction)
+		{
+			TransactionUniqueReference = $"{Guid.NewGuid().ToString().Replace("-", "").Substring(1, 27)}";
+
+			TransactionTitle = transaction.TransactionTitle;
+			TransactionAccount = transaction.TransactionAccount;
+			AccountBalance = transaction.AccountBalance;
+			TransactionAmmount = transaction.TransactionAmmount;
+			TransactionStatus = transaction.TransactionStatus;
+			TransactionSourceAccount = transaction.TransactionSourceAccount;
+			TransactionDestinationAccount = transaction.TransactionDestinationAccount;
+			TransactionParticulars = transaction.TransactionParticulars;
+			TransactionType = transaction.TransactionType;
+			TransactionDate = transaction.TransactionDate;
+	}
 
     }
 	public enum TranStatus

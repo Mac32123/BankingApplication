@@ -1,0 +1,104 @@
+<app-menubar-client></app-menubar-client>
+<div class="container justify-content-center">
+      <h1>Przelew złotowy na rachunek obcy</h1><br />
+  <h2>Twój rachunek</h2> <br />
+  <div col="12"><p>Z rachunku&emsp;Konto w Naszym Banku&emsp;{{accountNumber}}&emsp;{{amount}} PLN</p></div><br/>
+  <h2>Dane odbiorcy</h2>
+  <form [formGroup]="transactionForm"
+        (ngSubmit)="$event.preventDefault; next()">
+    <div class="row">
+    <div class="mb-3 mt-3 col-6 offset-3">
+        <label for="Receiver" class="form-label">Odbiorca</label>
+        <input type="text"
+               class="form-control"
+               formControlName="Receiver">
+        <app-validation-messages [FormControl]="transactionForm.get('Receiver')">
+          <app-validation-message [FormControl]="transactionForm.get('Receiver')"
+                                  [validator]="'required'">
+            To pole jest wymagane!
+          </app-validation-message>
+          <app-validation-message [FormControl]="transactionForm.get('Receiver')"
+                                  [validator]="'maxlength'">
+            Maksymalna długość: 80
+          </app-validation-message>
+        </app-validation-messages>
+    </div>
+      </div>
+    <div class="row">
+    <div class="mb-3 col-6 offset-3">
+      <label for="toAccount" class="form-label">Na rachunek</label>
+      <input type="text"
+             class="form-control"
+             formControlName="toAccount"
+             (change)="proceedeAccountNumber()">
+      <app-validation-messages [FormControl]="transactionForm.get('toAccount')">
+        <app-validation-message [FormControl]="transactionForm.get('toAccount')"
+                                [validator]="'required'">
+          To pole jest wymagane!
+        </app-validation-message>
+        <app-validation-message [FormControl]="transactionForm.get('toAccount')"
+                                [validator]="'maxlength'">
+          Numer rachunku musi zawierać 26 znaków!
+        </app-validation-message>
+        <app-validation-message [FormControl]="transactionForm.get('toAccount')"
+                                [validator]="'minlength'">
+          Numer rachunku musi zawierać 26 znaków!
+        </app-validation-message>
+      </app-validation-messages>
+    </div>
+      </div>
+    <h2>Dane przelewu</h2><br />
+    <div class="row">
+    <div class="mb-3 col-6 offset-3">
+      <label for="amount" class="form-label">Kwota przelewu</label>
+      <input type="number"
+             class="form-control"
+             formControlName="amount">
+      <app-validation-messages [FormControl]="transactionForm.get('amount')">
+        <app-validation-message [FormControl]="transactionForm.get('amount')"
+                                [validator]="'required'">
+          To pole jest wymagane!
+        </app-validation-message>
+        <app-validation-message [FormControl]="transactionForm.get('amount')"
+                                [validator]="'min'">
+          Najniższa możliwa kwota do 0.01 PLN
+        </app-validation-message>
+        <app-validation-message [FormControl]="transactionForm.get('amount')"
+                                [validator]="'max'">
+          Limit jednorazowego przelewu w bankowości online to 125 000 PLN. Aby dokonać większego przelewu skontaktuj się z przedstawicielem banku.
+        </app-validation-message>
+      </app-validation-messages>
+    </div>
+      </div>
+    <div class="row">
+    <div class="mb-3 col-6 offset-3">
+      <label for="title" class="form-label">Tytułem</label>
+      <textarea type="text"
+             class="form-control"
+             formControlName="title"
+             rows="5"
+             ></textarea>
+      <app-validation-messages [FormControl]="transactionForm.get('title')">
+        <app-validation-message [FormControl]="transactionForm.get('title')"
+                                [validator]="'required'">
+          To pole jest wymagane!
+        </app-validation-message>
+        <app-validation-message [FormControl]="transactionForm.get('title')"
+                                [validator]="'maxlength'">
+          Przekroczono maksymalną ilość znaków: 140
+        </app-validation-message>
+      </app-validation-messages>
+    </div>
+    <p class="text-danger">{{errorMessage}}</p>
+    <div class="d-flex justify-content-center">
+      <button *ngIf="loading == false"
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="transactionForm.invalid">
+        Dalej
+      </button>
+      <mat-progress-spinner *ngIf="loading == true" mode="indeterminate"></mat-progress-spinner>
+    </div>
+      </div>
+  </form>
+</div>

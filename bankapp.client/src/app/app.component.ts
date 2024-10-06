@@ -1,12 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Observable, fromEvent } from 'rxjs';
+import { StorageService } from '../shared/services/storage.service';
 
-interface WeatherForecast {
-  date: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
-}
 
 @Component({
   selector: 'app-root',
@@ -14,23 +10,24 @@ interface WeatherForecast {
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  public forecasts: WeatherForecast[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private storage: StorageService) { }
 
   ngOnInit() {
-    this.getForecasts();
+    this.storage.watchStorage().subscribe((data) => {
+      if (data) {
+        console.log(data);
+        this.token = localStorage.getItem('token');
+      }
+    })
   }
 
-  getForecasts() {
-    this.http.get<WeatherForecast[]>('/weatherforecast').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+  token = localStorage.getItem('token');
+
+  updateToken() {
+    console.log(this.token);
+    this.token = localStorage.getItem('token');
+    console.log(this.token);
   }
 
   title = 'bankapp.client';

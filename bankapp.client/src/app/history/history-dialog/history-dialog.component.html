@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>Szczegóły</h2>
+<mat-dialog-content>
+  <h2>Tytuł operacji</h2>
+  <p>{{data.title}}</p>
+  <h2>Z rachunku</h2>
+  <p>{{data.transactionSourceAccount}}</p>
+  <p>{{data.fromName}}</p>
+  <h2>Na rachunek</h2>
+  <p>{{data.transactionDestinationAccount}}</p>
+  <p>{{data.toName}}</p>
+  <h2>Data transakcji</h2>
+  <p>{{data.date}}</p>
+  <h2>Kwota w PLN</h2>
+  <p>{{data.amount}}</p>
+  <h2>Saldo w PLN po operacji</h2>
+  <p>{{data.accountBalance}}</p>
+</mat-dialog-content>
+<mat-dialog-actions style="justify-content:right">
+  <button mat-button color="primary" (click)="pdf()">Pobierz pdf</button>
+  <button mat-button mat-dialog-close color="primary">Zamknij</button>
+</mat-dialog-actions>

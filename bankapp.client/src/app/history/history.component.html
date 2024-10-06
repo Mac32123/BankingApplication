@@ -1,0 +1,68 @@
+<app-menubar-client></app-menubar-client>
+<h1>Historia</h1>
+
+<div class="container d-flex justify-content-center">
+  <div>
+    <label>Okres</label>
+    <mat-select [(value)]="period"
+                (selectionChange)="fetchNewData()">
+      <mat-option value="0">Ostatnie 30 dni</mat-option>
+      <mat-option value="1">Bieżący miesiąc ({{months[today.getMonth()]}})</mat-option>
+      <mat-option value="2">Poprzedni miesiąc ({{months[(today.getMonth()-1)%12]}})</mat-option>
+      <mat-option value="3">Bieżący rok ({{today.getFullYear()}})</mat-option>
+      <mat-option value="4">Poprzedni rok ({{today.getFullYear()-1}})</mat-option>
+      <mat-option value="5">Ostatnie 12 miesięcy</mat-option>
+      <mat-option value="6">Cała dostępna historia</mat-option>
+    </mat-select>
+  </div>
+  <div>
+    <label>Wydatki i wpływy</label>
+    <mat-select [(value)]="balance"
+                (selectionChange)="fetchNewData()">
+      <mat-option value="2">Wydatki i wpływy</mat-option>
+      <mat-option value="1">Wydatki</mat-option>
+      <mat-option value="0">Wpływy</mat-option>
+    </mat-select>
+  </div>
+</div>
+
+<div class="container mt-4">
+  <mat-table class="mat-elevation-z8" [dataSource]="dataSource" matSort>
+      <!-- Name Column -->
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Data transakcji </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{element.date}}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Weight Column -->
+      <ng-container matColumnDef="toFrom">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Odbiorca/Nadawca </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.toFrom}} </mat-cell>
+      </ng-container>
+
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="title">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Tytuł </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.title}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="amount">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Kwota </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.amount}} PLN</mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showDetails(row)"></mat-row>
+  </mat-table>
+  <div *ngIf="loading">
+    <ngx-skeleton-loader count="7"></ngx-skeleton-loader>
+  </div>
+  <div *ngIf="!loading&&dataSource.data.length === 0">
+    Brak wyników
+  </div>
+</div>
+
+
+
+{{errorMessage}}

@@ -41,6 +41,10 @@ namespace BankApp.Server.Migrations
                     b.Property<int>("AccountType")
                         .HasColumnType("int");
 
+                    b.Property<string>("ActualAccountNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("CurrentAccountBalance")
                         .HasColumnType("decimal(18,2)");
 
@@ -87,6 +91,13 @@ namespace BankApp.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("AccountBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TransactionAccount")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("TransactionAmmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -107,6 +118,10 @@ namespace BankApp.Server.Migrations
 
                     b.Property<int>("TransactionStatus")
                         .HasColumnType("int");
+
+                    b.Property<string>("TransactionTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");

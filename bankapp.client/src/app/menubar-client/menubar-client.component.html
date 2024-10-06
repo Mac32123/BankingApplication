@@ -1,0 +1,14 @@
+<mat-toolbar color="primary" class="mat-elevation-r6">
+  <img src="/assets/bank.png" style="width:50px; height:50px; padding-right:10px" />
+  <span>Symulator Banku</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="finanse">Finanse</button>
+  <button mat-button routerLink="przelewy">Przelewy</button>
+  <button mat-button routerLink="historia">Historia</button>
+  <div>
+    <button mat-button (click)="logout()">Wyloguj się</button>
+    <button mat-button (click)="getNewToken()">{{difference}}</button>
+  </div>
+  <button mat-button routerLink="ustawienia"><mat-icon>settings</mat-icon></button>
+</mat-toolbar>
+

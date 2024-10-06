@@ -17,7 +17,7 @@ namespace BankApp.Server.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	//[Authorize]
+	[Authorize]
 	public class AccountsController : ControllerBase
 	{
 		private IAccountService _accountService;
@@ -34,7 +34,7 @@ namespace BankApp.Server.Controllers
 
 		[HttpPost]
 		[Route("register")]
-		//[RequiresClaim(ClaimTypes.Role, "Administrator")]
+		[RequiresClaim(ClaimTypes.Role, "Administrator")]
 		[AllowAnonymous]
 		public IActionResult RegisterNewAccount([FromBody] RegisterNewAccountModel newAccount)
 		{
@@ -52,7 +52,7 @@ namespace BankApp.Server.Controllers
 
 		[HttpGet]
 		[Route("get_all_accounts")]
-		//[RequiresClaim(ClaimTypes.Role, "Administrator")]
+		[RequiresClaim(ClaimTypes.Role, "Administrator")]
 
 		public IActionResult GetAllAccounts()
 		{
@@ -60,6 +60,19 @@ namespace BankApp.Server.Controllers
 			var cleanedAccounts = _mapper.Map<List<GetAccountModel>>(accounts);
 			return Ok(cleanedAccounts);
 		}
+
+		[HttpGet]
+		[Route("check_account_number")]
+		[AllowAnonymous]
+
+		public IActionResult Check(string actualAccountNumber)
+		{
+			Account? acc = _accountService.GetByActualAccountNumber(actualAccountNumber);
+			if (acc is null) return NotFound(new {found = false});
+			else return Ok(new {found = false});
+		}
+
+
 
 		[HttpPost]
 		[Route("authenticate")]
@@ -76,8 +89,31 @@ namespace BankApp.Server.Controllers
 				AuthenticatedAccountModel AuthAcc = _mapper.Map<AuthenticatedAccountModel>(acc);
 				if (AuthAcc.AccountType == AccountType.BankManagement) AuthAcc.AuthorizationToken = _accountService.GenerateToken(AuthAcc.AccountNumberGenerated, "Administrator");
 				else AuthAcc.AuthorizationToken = AuthAcc.AuthorizationToken = _accountService.GenerateToken(AuthAcc.AccountNumberGenerated, "User");
-				return Ok(AuthAcc);
+				return Ok(new {token = AuthAcc.AuthorizationToken });
 			}
+		}
+
+		[HttpGet]
+		[Route("renewToken")]
+
+		public IActionResult renewToken()
+		{
+			var accountNumber = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+			var account = _accountService.GetByAccountNumber(accountNumber);
+			string AuthorizationToken; 
+				if (account.AccountType == AccountType.BankManagement) AuthorizationToken = _accountService.GenerateToken(account.AccountNumberGenerated, "Administrator");
+				else AuthorizationToken = _accountService.GenerateToken(account.AccountNumberGenerated, "User");
+				return Ok(new {token = AuthorizationToken });
+		}
+
+
+		[HttpGet]
+		[Route("get_current")]
+		public IActionResult Test() {
+			var accountNumber = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+			var account = _accountService.GetByAccountNumber(accountNumber);
+
+			return Ok(account);
 		}
 
 		[HttpGet]
@@ -106,25 +142,27 @@ namespace BankApp.Server.Controllers
 		public IActionResult UpdateAccount([FromBody] UpdateAccountModel model)
 		{
 			if (!ModelState.IsValid) return BadRequest(model);
+
 			var account = _mapper.Map<Account>(model);
+			account.AccountNumberGenerated = HttpContext.User.FindFirstValue(ClaimTypes.Name);
 			try
 			{
-				return Ok(_accountService.Update(account, model.Pin, model.PinToBeUpdated));
+				return Ok(_accountService.Update(account, model.PinToBeUpdated));
 			}
 			catch (Exception ex)
 			{
-				return Unauthorized(new ErrorResponse() { title = "Validation error", status = 401, message = ex.Message });
+				return BadRequest(new ErrorResponse() { title = "Conflict occured", status = 409, message = ex.Message });
 			}
 		}
 
 		[HttpDelete]
 		[Route("delete")]               //zrobić wymaganie żeby nie było pieniędzy na koncie
 		[RequiresClaim(ClaimTypes.Role, "Administrator")]
-		public IActionResult Delete(int id)
+		public IActionResult Delete(string accountNumber)
 		{
 			try
 			{
-				return Ok(Ok(Ok(Ok(Ok(Ok(_accountService.Delete(id)))))));
+				return Ok(Ok(Ok(Ok(Ok(Ok(_accountService.Delete(accountNumber)))))));
 			}
 			catch (Exception ex)
 			{

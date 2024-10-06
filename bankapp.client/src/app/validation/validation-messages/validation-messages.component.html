@@ -1,0 +1,5 @@
+<div *ngIf="FormControl.invalid && (FormControl.dirty || FormControl.touched)">
+    <ng-content
+    select="app-validation-message"
+    ></ng-content>
+</div>

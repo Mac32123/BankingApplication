@@ -1,0 +1,52 @@
+<app-menubar></app-menubar>
+<div class="container mx-0 mt-5">
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-4">
+      <p class="fs-1 text-start" style="line-height:1.5; font-weight: bold">Otwórz konto i odbierz promocję!</p>
+      <p class="fs-3 text-start" style="line-height:1">Oszczędzaj nawet do 9% przez pierwsze 6 miesięcy! </p>
+      <p class="fs-4 text-start" style="line-height:1">Specjalnie dla Ciebie mamy przygotowane specjalne premie, zniżki i pakiety bezpieczeństwa! Wystarczy założyć konto i polecić bank znajomym.</p>
+      <p class="fs-4 text-start" style="line-height:1">- <b>200 zł premii</b> za zachęcenie znajomych do założenia konta<br />- <b>0%</b> za przewalutowanie<br />- możliwość uruchomienia dodatkowych <b>zabezpieczeń konta</b></p>
+      <button mat-flat-button color="primary" class="mt-3" (click)="openDialog()">Dowiedz się więcej</button>
+    </div>
+    <div class="col-1"></div>
+    <img mat-card-lg-image src="/assets/money.avif" class="col-6" />
+  </div>
+</div>
+
+<div class="container mx-0 mt-5">
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-4" style="align-content:center">
+      <p class="fs-1 text-start" style="line-height:1.5; font-weight: bold">Konto dla młodych w naszym banku</p>
+      <p class="fs-3 text-start" style="line-height:1">Załóż konto, a dostaniesz nawet 200 zł premii! </p>
+      <p class="fs-4 text-start" style="line-height:1">Przygotowaliśmy specjalnie dla Ciebie specjalne promocje:</p>
+      <p class="fs-4 text-start" style="line-height:1">- <b>0 zł</b> za prowadzenie konta i kartę<br />- <b>0%</b> za przewalutowanie<br />- dopasowanie karty kredytowej do Twoich preferencji</p>
+      <button mat-flat-button color="primary" class="mt-3" (click)="openDialog()">Dowiedz się więcej</button>
+    </div>
+    <div class="col-1"></div>
+    <img mat-card-lg-image src="/assets/mlody.avif" class="col-6" />
+  </div>
+</div>
+
+<div class="container mp-0 mx-3 mt-5" style="border:solid 2px">
+  <div class="row">
+    <p class="fs-1 text-center mt-3 mb-4">Oblicz wysokość swojego kredytu</p>
+    <div class="col-6" style="border-right: solid 3px">
+      <label for="kwota" class="form-label fs-5">Pożyczana kwota</label>
+      <input type="number" class="form-control" id="kwota" placeholder="500" [(ngModel)]="kwota" (change)="kwotaChange()">
+      <input type="range" class="form-range mt-3" min="500" max="200000" id="kwotaRange" [(ngModel)]="kwota" (change)="kwotaChange()">
+      <label for="raty" class="form-label fs-5">Ilość rat</label>
+      <input type="number" class="form-control" id="raty" placeholder="3" [(ngModel)]="raty" (change)="kwotaChange()">
+      <input type="range" class="form-range mt-3" min="3" max="120" id="ratyRange" [(ngModel)]="raty" (change)="kwotaChange()">
+    </div>
+    <div class="col-6">
+      <p class="fs-5 text-start"><b>Podsumowanie kredytu</b></p>
+      <p class="fs-5 text-start">Rata miesięczna: {{rataS}} zł</p>
+      <p class="fs-5 text-start">RRSO: {{RRSO}}%</p>
+      <p class="fs-5 text-start">Oprocentowanie: {{oprocentowanie}}%</p>
+      <p class="fs-5 text-start">Prowizja: 0 zł</p>
+      <p class="fs-5 text-start">Całkowity koszt kredytu {{kosztS}} zł</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<app-menubar-client></app-menubar-client>
+<div class="container justify-content-center">
+  <h1>Zaktualizuj swoje dane</h1><br />
+  <form [formGroup]="settingsForm"
+        (ngSubmit)="$event.preventDefault; send()">
+    <div class="row">
+      <div class="mb-3 mt-3 col-6 offset-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email"
+               class="form-control"
+               formControlName="email">
+        <app-validation-messages [FormControl]="settingsForm.get('email')">
+          <app-validation-message [FormControl]="settingsForm.get('email')"
+                                  [validator]="'email'">
+            Nieprawidłowy email!
+          </app-validation-message>
+        </app-validation-messages>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-3 col-6 offset-3">
+        <label for="phoneNumber" class="form-label">Numer telefonu</label>
+        <input type="text"
+               class="form-control"
+               formControlName="phoneNumber">
+        <app-validation-messages [FormControl]="settingsForm.get('phoneNumber')">
+          <app-validation-message [FormControl]="settingsForm.get('phoneNumber')"
+                                  [validator]="'pattern'">
+            Nieprawidłowy numer telefonu!
+          </app-validation-message>
+        </app-validation-messages>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-3 col-6 offset-3">
+        <label for="newPassword" class="form-label">Nowe hasło</label>
+        <input type="password"
+               class="form-control"
+               formControlName="newPassword"
+               (change)="check()">
+        <app-validation-messages [FormControl]="settingsForm.get('newPassword')">
+          <app-validation-message [FormControl]="settingsForm.get('newPassword')"
+                                  [validator]="'minlength'">
+            Hasło musi zawierać przynajmniej 8 znaków
+          </app-validation-message>
+          <app-validation-message [FormControl]="settingsForm.get('newPassword')"
+                                  [validator]="'maxlength'">
+            Hasło może zawierać najwyżej 20 znaków
+          </app-validation-message>
+          <app-validation-message [FormControl]="settingsForm.get('newPassword')"
+                                  [validator]="'pattern'">
+            Hasło musi zawierać przynajmniej jedną małą literę, jedną dużą literę, jedną cyfrę i jeden znak specjalny (&#64;$!%*?&)
+          </app-validation-message>
+        </app-validation-messages>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-3 col-6 offset-3">
+        <label for="confirmPassword" class="form-label">Potwierdź nowe hasło</label>
+        <input type="password"
+               class="form-control"
+               formControlName="confirmPassword"
+               (change)="check()">
+        <app-validation-messages [FormControl]="settingsForm.get('confirmPassword')">
+          <app-validation-message [FormControl]="settingsForm.get('confirmPassword')"
+                                  [validator]="'required'">
+            Potwierdź hasło!
+          </app-validation-message>
+          <app-validation-message [FormControl]="settingsForm.get('confirmPassword')"
+                                  [validator]="'notSame'">
+            Hasła muszą się zgadzać!
+          </app-validation-message>
+        </app-validation-messages>
+      </div>
+      <p class="text-danger">{{errorMessage}}</p>
+      <p class="text-success">{{successMessage}}</p>
+      <div class="d-flex justify-content-center">
+        <button *ngIf="loading == false"
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="settingsForm.invalid">
+          Dalej
+        </button>
+        <mat-progress-spinner *ngIf="loading == true" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    </div>
+  </form>
+</div>

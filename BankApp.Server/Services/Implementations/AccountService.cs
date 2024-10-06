@@ -3,7 +3,6 @@ using BankApp.Server.Models;
 using BankApp.Server.Services.Interfaces;
 using BankApp.Server.Utils;
 using Microsoft.Extensions.Options;
-using System.Runtime;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -21,7 +20,7 @@ namespace BankApp.Server.Services.Implementations
 		private IMapper _mapper;
 		private static string _BankManagementAccount;
 		private Random rand = new Random();
-		private Xeger xeger = new Xeger(@"^(?=.* [a - z])(?=.* [A - Z])(?=.*\d)(?=.* [@$! % *? &])[A - Za - z\d@$! % *? &]{8,20}$");
+		private Xeger xeger = new Xeger(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\@$!%*?&])[A-Za-z\d\@$!%*?&]{8,10}$");
 
 		public AccountService(BankDbContext dbContext, IOptions<AppSettings> settings, IOptions<JwtSettings> options, IMapper mapper)
         {
@@ -66,7 +65,7 @@ namespace BankApp.Server.Services.Implementations
 		{
 			if (_dbContext.accounts.Any(x => x.Email == account.Email)) throw new ApplicationException("An account with this email already exists");	//być może usunąć
 			byte[] pinHash, pinSalt;
-			var Pin = xeger.Generate();
+			var Pin = $"{xeger.Generate()}".Substring(0, rand.Next(8, 20));
 			CreatePinHash(Pin,  out pinHash, out pinSalt);
 		
 			account.PinHash = pinHash;
@@ -76,7 +75,9 @@ namespace BankApp.Server.Services.Implementations
 			do
 			{
 				account.AccountNumberGenerated = Convert.ToString((long)(rand.NextDouble() * 9000000000L + 1000000000L));
+				account.ActualAccountNumber = "521234" + Convert.ToString((long)(rand.NextDouble()*10000000000L)) + Convert.ToString((long)(rand.NextDouble()*10000000000L));
 				duplicate = _dbContext.accounts.Where(x => x.AccountNumberGenerated == account.AccountNumberGenerated).SingleOrDefault();
+				if(duplicate is null) duplicate = _dbContext.accounts.Where(x => x.ActualAccountNumber == account.ActualAccountNumber).SingleOrDefault();
 			}
 			while (duplicate is not null);
 
@@ -84,9 +85,12 @@ namespace BankApp.Server.Services.Implementations
 
 			_dbContext.accounts.Add(account);
 			_dbContext.SaveChanges();
-			
 
-			return _mapper.Map<CreatedAccountModel>(account);
+
+			var CreatedAcc = _mapper.Map<CreatedAccountModel>(account);
+			CreatedAcc.Pin = Pin;
+
+			return CreatedAcc;
 
 		}
 
@@ -98,9 +102,9 @@ namespace BankApp.Server.Services.Implementations
 				pinHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(pin));
 			}
 		}
-		public Account Delete(int id)
+		public Account Delete(string accountNumber)
 		{
-			var account = _dbContext.accounts.Find(id);
+			var account = _dbContext.accounts.Where(x => x.AccountNumberGenerated == accountNumber).FirstOrDefault();
 			if (account != null)
 			{
 				_dbContext.accounts.Remove(account);
@@ -122,6 +126,13 @@ namespace BankApp.Server.Services.Implementations
 			return account;
 		}
 
+		public Account? GetByActualAccountNumber(string ActualAccountNumber)
+		{
+			var account = _dbContext.accounts.Where(x => x.ActualAccountNumber == ActualAccountNumber).FirstOrDefault();
+			if (account == null) return null;
+			return account;
+		}
+
 		public Account? GetById(int id)
 		{
 			var account = _dbContext.accounts.Find(id);
@@ -132,21 +143,21 @@ namespace BankApp.Server.Services.Implementations
 			return account;
 		}
 
-		public Account Update(Account account, string Pin, string? PinToBeUpdated)
+		public Account Update(Account account, string? PinToBeUpdated)
 		{
 			//dodać gdzieś potwierdzenie emaila i telefonu
-			
-			var accountToBeUpdated = Authenticate(account.AccountNumberGenerated, Pin);
+
+			var accountToBeUpdated = GetByAccountNumber(account.AccountNumberGenerated);
 
 			if (accountToBeUpdated == null) throw new ApplicationException("Account number or password are wrong");
 			if (!string.IsNullOrWhiteSpace(account.Email))
 			{
-				if (_dbContext.accounts.Any(x => x.Email == account.Email && x.AccountNumberGenerated != account.AccountNumberGenerated)) throw new ApplicationException($"This emai: {account.Email} is already taken");
+				if (_dbContext.accounts.Any(x => x.Email == account.Email && x.AccountNumberGenerated != account.AccountNumberGenerated)) throw new ApplicationException($"Ten email: {account.Email} jest już zajęty");
 				accountToBeUpdated.Email = account.Email;	
 			}
 			if (!string.IsNullOrWhiteSpace(account.PhoneNumber))
 			{
-				if (_dbContext.accounts.Any(x => x.PhoneNumber == account.PhoneNumber && x.AccountNumberGenerated != account.AccountNumberGenerated)) throw new ApplicationException($"This phone number: {account.PhoneNumber} is already taken");
+				if (_dbContext.accounts.Any(x => x.PhoneNumber == account.PhoneNumber && x.AccountNumberGenerated != account.AccountNumberGenerated)) throw new ApplicationException($"Ten numer telefonu: {account.PhoneNumber} jest już zajęty");
 				accountToBeUpdated.PhoneNumber = account.PhoneNumber;
 			}
 			if (!string.IsNullOrWhiteSpace(PinToBeUpdated))
@@ -174,14 +185,14 @@ namespace BankApp.Server.Services.Implementations
 
 			var claims = new[]
 			{
-				new Claim(JwtRegisteredClaimNames.Sub, AccountNumber),
+				new Claim(ClaimTypes.Name, AccountNumber),
 				new Claim(ClaimTypes.Role, role)
 			};
 
 			var securityToken = new JwtSecurityToken(
 				issuer: _jwtSettings.Issuer,
 				audience: _jwtSettings.Audience,
-				expires: DateTime.UtcNow.AddHours(1),
+				expires: DateTime.UtcNow.AddMinutes(5),
 				claims: claims,
 				signingCredentials: signingCredentials);
 

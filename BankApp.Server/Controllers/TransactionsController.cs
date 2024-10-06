@@ -11,7 +11,7 @@ namespace BankApp.Server.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	//[Authorize]
+	[Authorize]
 	public class TransactionsController : ControllerBase
 	{
 
@@ -35,12 +35,12 @@ namespace BankApp.Server.Controllers
 			return Ok(_transactionServices.CreateNewTransaction(transaction));
 		}
 
-		[HttpPost]
+		[HttpGet]
 		[Route("make_deposit")]
-		//[RequiresClaim(ClaimTypes.Role, "Administrator")]
+		[RequiresClaim(ClaimTypes.Role, "Administrator")]
 		public IActionResult MakeDeposit(string AccountNumber, decimal Amount)
 		{
-			if (!Regex.IsMatch(AccountNumber, @"^[0][1-9]\d{9}$|^[1-9]\d{9}$")) return BadRequest("Account number must be 10-digits");
+			if (!Regex.IsMatch(AccountNumber, @"^\d{26}$")) return BadRequest("Account number must be 26-digits");
 			try
 			{
 				return Ok(_transactionServices.MakeDeposit(AccountNumber, Amount));
@@ -51,12 +51,12 @@ namespace BankApp.Server.Controllers
 			}
 		}
 
-		[HttpPost]
+		[HttpGet]
 		[Route("make_withdrawal")]
-		//[RequiresClaim(ClaimTypes.Role, "Administrator")]
+		[RequiresClaim(ClaimTypes.Role, "Administrator")]
 		public IActionResult MakeWithdrawal(string AccountNumber, decimal Amount)
 		{
-			if (!Regex.IsMatch(AccountNumber, @"^[0][1-9]\d{9}$|^[1-9]\d{9}$")) return BadRequest("Account number must be 10-digits");
+			if (!Regex.IsMatch(AccountNumber, @"^\d{26}$")) return BadRequest("Account number must be 10-digits");
 			try
 			{
 				return Ok(_transactionServices.MakeWithdrawal(AccountNumber, Amount));
@@ -69,17 +69,26 @@ namespace BankApp.Server.Controllers
 
 		[HttpPost]
 		[Route("make_transfer")]
-		public IActionResult MakeTransfer(string FromAccount, string ToAccount, decimal Amount, string TransactionPin)
+		public IActionResult MakeTransfer(string ToAccount, decimal Amount, string title)
 		{
-			if (!Regex.IsMatch(FromAccount, @"^[0][1-9]\d{9}$|^[1-9]\d{9}$") || !Regex.IsMatch(ToAccount, @"^[0][1-9]\d{9}$|^[1-9]\d{9}$")) return BadRequest("Account number must be 10-digits");
+			var FromAccount = HttpContext.User.FindFirstValue(ClaimTypes.Name);
 			try
 			{
-				return Ok(_transactionServices.MakeFundsTransfer(FromAccount, ToAccount, Amount, TransactionPin));
+				return Ok(_transactionServices.MakeFundsTransfer(FromAccount, ToAccount, Amount, title));
 			}
 			catch (Exception ex)
 			{
-				return Unauthorized(new ErrorResponse() { title = "Validation error", status = 401, message = ex.Message });
+				return BadRequest(new ErrorResponse() { title = "Validation error", status = 400, message = ex.Message });
 			}
+		}
+
+		[HttpGet]
+		[Route("get_transaction")]
+		public IActionResult getTransaction(int toFrom, DateTime? startingDate, DateTime? endingDate)
+		{
+			var Account = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+
+			return Ok(_transactionServices.GetAllTransactions(Account, toFrom, startingDate, endingDate));
 		}
 	}
 }

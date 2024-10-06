@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 		ValidateIssuerSigningKey = true
 	};
 });
+builder.Services.AddCors();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -62,6 +63,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCors(options =>
+	 options.WithOrigins("https://localhost:4200")
+			.AllowAnyHeader()
+			.AllowAnyMethod());
 
 app.MapControllers();
 

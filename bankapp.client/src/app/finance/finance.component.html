@@ -1,0 +1,54 @@
+<app-menubar-client></app-menubar-client>
+<div class="container justify-content-center">
+  <mat-card class="m-5 col-12">
+    <mat-card-title class="mb-3">
+      Konta
+    </mat-card-title>
+    <mat-card-content>
+      <div class="col-3 d-inline-block">
+        <b>Konto w Naszym Banku</b><br />
+        {{accountNumber}}
+      </div>
+      <div class="col-3 d-inline-block">
+        <b>Dostępne środki</b><br />
+        {{amount}} PLN
+      </div>
+      <div class="col-3 d-inline-block" style="align-items: center">
+        <button mat-button color="primary" routerLink="/przelewy">Przelew</button>
+        <button mat-button color="primary" routerLink="/historia">Historia</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="m-5 col-12">
+    <mat-card-title class="mb-3">
+      Twoje karty
+    </mat-card-title>
+    <mat-card-content>
+      <img mat-image src="../../assets/karta.png" class="col-3 d-inline-block m-6" style="float: left" height="150" />
+      <div style="float:left;" class="col-3">
+        Karta kredytowa<br />
+        xxxx xxxx xxxx 4342<br />
+        {{name}}
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="m-5 col-12">
+    <mat-card-title class="mb-3">
+      Podsumowanie
+    </mat-card-title>
+    <mat-card-content>
+      <div class="col-3 d-inline-block">
+        <b>Oszczędności</b><br />
+        {{amount}} PLN
+      </div>
+      <div class="col-3 d-inline-block">
+        <b>Zobowiązania</b><br />
+        0,00 PLN
+      </div>
+      <div class="col-3 d-inline-block">
+        <b>Razem</b><br />
+        {{amount}} PLN
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
